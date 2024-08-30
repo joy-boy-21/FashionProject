@@ -1,0 +1,22 @@
+{
+    "name": "Color Matching Chatbot",
+    "short_name": "ColorMatch",
+    "description": "A chatbot that suggests matching colors based on outfit color.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#28a745",
+    "icons": [
+      {
+        "src": "/static/icons/icon-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/static/icons/icon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+

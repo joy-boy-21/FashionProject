@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Matching Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('static/images/logo.png'), linear-gradient(135deg, #e2e2e2, #ffffff);
+            background-blend-mode: overlay;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chatbox {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.3); /* Adjust the alpha value for transparency */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 100px; /* Adjust size as needed */
+            height: auto;
+        }
+        .chatbox::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            z-index: -1;
+        }
+        .chat-log {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .chat-log .chat-message {
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        .chat-log .chat-message.user {
+            text-align: right;
+            background: #d1e7dd;
+        }
+        .chat-log .chat-message.bot {
+            text-align: left;
+            background: #e2e3e5;
+        }
+        .chat-input {
+            display: flex;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background: #28a745;
+            color: white;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chatbox">
+    <div class="logo">
+        <img src="static/images/logo.png" alt="Logo">
+    </div>
+    <div class="chat-log" id="chat-log">
+        <div class="chat-message bot">Hi I'm your personal Chatbot! Enter the RGB values of the outfit color, and I'll suggest a matching color!</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Enter RGB values, e.g., 128, 0, 128">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const userInput = document.getElementById('user-input').value;
+        const chatLog = document.getElementById('chat-log');
+        
+        if (userInput) {
+            const rgb = userInput.split(',').map(Number);
+            const message = document.createElement('div');
+            message.classList.add('chat-message', 'user');
+            message.textContent = `You: ${userInput}`;
+            chatLog.appendChild(message);
+            
+            document.getElementById('user-input').value = '';
+            
+            // Send the RGB values to the backend
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    r: rgb[0],
+                    g: rgb[1],
+                    b: rgb[2],
+                }),
+            });
+            
+            const data = await response.json();
+            const matchingColor = data.matching_color;
+
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('chat-message', 'bot');
+            botMessage.textContent = `Bot: Matching color is RGB(${matchingColor.join(', ')})`;
+            chatLog.appendChild(botMessage);
+
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    }
+</script>
+
+</body>
+</html>
